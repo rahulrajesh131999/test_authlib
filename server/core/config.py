@@ -5,8 +5,11 @@ from typing import Annotated
 
 class Settings(BaseSettings):
     DATABASE_URL : str
+    CLIENT_ID : str
+    CLIENT_SECRET : str
+    SERVER_METADATA_URL : str
 
-    model_config = SettingsConfigDict(env_file=".env.local")
+    model_config = SettingsConfigDict(env_file=".env")
 
 
 @lru_cache

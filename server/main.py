@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from starlette.middleware.sessions import SessionMiddleware
 
 from core.db import create_db_and_tables
 
@@ -13,7 +14,7 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
+app.add_middleware(SessionMiddleware,secret_key = "some-random-string")
 
 
 @app.get("/")
