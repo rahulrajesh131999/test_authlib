@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from starlette.middleware.sessions import SessionMiddleware
 
 from core.db import create_db_and_tables
+from authlib import authlib
 
 
 @asynccontextmanager
@@ -15,6 +16,8 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(SessionMiddleware,secret_key = "some-random-string")
+
+app.include_router(authlib.router)
 
 
 @app.get("/")

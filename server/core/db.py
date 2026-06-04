@@ -2,10 +2,12 @@ from sqlmodel import create_engine, SQLModel, Session
 from fastapi import Depends
 from typing import Annotated
 
-from core.config import SettingsDep
+from core.config  import get_settings
+
+settings = get_settings()
 
 
-engine = create_engine(SettingsDep.DATABASE_URL, echo=True)
+engine = create_engine(settings.DATABASE_URL, echo=True)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
