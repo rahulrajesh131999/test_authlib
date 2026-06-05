@@ -27,4 +27,4 @@ def get_password_hash(plain_password:str):
     return password_hash.hash(plain_password)
 
 def verify_password_hash(plain_password:str, hash_password:str):
-    return password_hash.verify(hash=hash_password, password=plain_password)
+    return password_hash.verify(hash_password=hash, password=plain_password)

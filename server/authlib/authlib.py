@@ -46,7 +46,7 @@ async def auth_via_google(request:Request, session:SessionDep):
         user_exists = session.exec(select(User).where(User.email == user.email)).first()
 
         if not user_exists:
-            new_user = await create_new_user(session= session, email = user.email,google_id=user.sub, name=user.name)
+            new_user = await create_new_user(session= session, email = user.email, google_id=user.sub, name=user.name)
 
             if not new_user:
                 raise HTTPException(

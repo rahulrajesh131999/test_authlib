@@ -14,7 +14,9 @@ class UserBase(SQLModel):
     email : EmailStr = Field(unique=True)
     
 class UserPass(UserBase):
-    password : str | None = Field(default=None,min_length=8, max_length=24) 
+    password : str | None = Field(default=None,min_length=8, max_length=24)
+    confirm_password : str | None = Field(default=None,min_length=8, max_length=24)
+   
 
 class User(UserBase, table=True):
     id : uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -27,4 +29,5 @@ class User(UserBase, table=True):
 
 class UserRead(UserBase):
     id : uuid.UUID
+    google_login_id : str | None = None
     created_at : datetime
