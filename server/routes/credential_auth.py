@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
 from model import UserPass, User, UserRead
-from crud import create_new_user
+from crud import create_new_user, authenticate
 from core.security import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["/auth"])
@@ -47,3 +47,44 @@ async def register(session:Session, user:UserPass):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )
+
+
+@router.post("login")
+async def login(session:Session, user:UserPass):
+
+    email = user.email
+    password = user.password
+
+    if not email or not password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="both email and password required of login"
+        )
+    
+
+    user = await authenticate(email=email, password=password, session=Session)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="user authentication failed"
+        )
+    
+    db_object = User.model_validate(user)
+
+    access_token = await create_access_token(data=db_object.id, expires_at=28)
+
+    response = JSONResponse(
+        content={"user" : db_object.model_dump(mode="json")}
+    )
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        expires= 60 * 60 * 24 * 28
+    )
+
+    return response
+
+

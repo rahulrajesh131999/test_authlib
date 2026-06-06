@@ -54,10 +54,8 @@ async def create_new_user(session:Session, google_id:str | None, password:str, c
     
 
 
-async def authenticate(session:Session, user:UserPass, settings:SettingsDep):
+async def authenticate(session:Session, email:EmailStr, password:str, settings:SettingsDep):
 
-    email = user.email
-    password = user.password
 
     if not email or not password:
         raise HTTPException(
