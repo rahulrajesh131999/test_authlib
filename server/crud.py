@@ -5,9 +5,10 @@ from pydantic import EmailStr
 from model import User, UserPass
 from core.security import get_password_hash, verify_password_hash
 from core.config import SettingsDep
+from core.db import SessionDep
 
 
-async def create_new_user(session:Session, google_id:str | None, password:str, confirm_password:str, email:EmailStr, name:str):
+async def create_new_user(session:SessionDep, google_id:str | None, password:str, confirm_password:str, email:EmailStr, name:str):
     
     if google_id:
         new_user = await User(
@@ -54,7 +55,7 @@ async def create_new_user(session:Session, google_id:str | None, password:str, c
     
 
 
-async def authenticate(session:Session, email:EmailStr, password:str, settings:SettingsDep):
+async def authenticate(session:SessionDep, email:EmailStr, password:str, settings:SettingsDep):
 
 
     if not email or not password:

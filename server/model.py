@@ -20,7 +20,7 @@ class UserPass(UserBase):
 
 class User(UserBase, table=True):
     id : uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    hashed_password = str | None = None
+    hashed_password : str | None = None
     google_login_id : str | None = None
     created_at : datetime | None = Field(
         default_factory=get_date_utc,

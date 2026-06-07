@@ -1,13 +1,13 @@
 from fastapi import Depends, Cookie, HTTPException, status
 from typing import Annotated
-from sqlmodel import Session
 import jwt
 
 from core.security import decode_token
 from model import User
+from core.db import SessionDep
 
 
-async def current_user(session:Session, access_token: Annotated[str | None , Cookie(alias="access_token")]):
+async def current_user(session:SessionDep, access_token: Annotated[str | None , Cookie(alias="access_token")]):
     if access_token:
         try:
             payload = decode_token(access_token=access_token)

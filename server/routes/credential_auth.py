@@ -5,13 +5,13 @@ from sqlmodel import Session
 from model import UserPass, User, UserRead
 from crud import create_new_user, authenticate
 from core.security import create_access_token
+from core.depends import Current_User
 
 router = APIRouter(prefix="/auth", tags=["/auth"])
 
 
 @router.post("/register")
-async def register(session:Session, user:UserPass):
-    
+async def register(user:UserPass):
     try:
         created_user = await create_new_user(session=Session,
                                              name=user.full_name,
@@ -49,8 +49,8 @@ async def register(session:Session, user:UserPass):
         )
 
 
-@router.post("login")
-async def login(session:Session, user:UserPass):
+@router.post("/login")
+async def login( user:UserPass):
 
     email = user.email
     password = user.password
@@ -88,3 +88,16 @@ async def login(session:Session, user:UserPass):
     return response
 
 
+@router.get("/me")
+async def current_user(current_user:Current_User):
+
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not authorized"
+        )
+
+    user = UserRead.model_validate(user)
+
+    return JSONResponse(
+        content={"user":user.model_dump(mode="json")}
+    )

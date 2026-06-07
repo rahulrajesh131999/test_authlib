@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.db import create_db_and_tables
-from authlib import authlib
+from authlib_setup import authlib
+from routes import credential_auth
 
 
 @asynccontextmanager
@@ -15,9 +17,26 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(SessionMiddleware,secret_key = "some-random-string")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.include_router(authlib.router)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="some-random-string",
+)
+
+routers = [
+    authlib.router,
+    credential_auth.router
+]
+
+for router in routers:
+    app.include_router(router, prefix="/api/v1")
 
 
 @app.get("/")
