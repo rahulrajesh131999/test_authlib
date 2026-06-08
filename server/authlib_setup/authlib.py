@@ -6,7 +6,7 @@ from sqlmodel import select
 
 from core.config import get_settings
 from core.db import SessionDep
-from model import User
+from model import User, UserRead
 from crud import create_new_user
 from core.security import create_access_token
 
@@ -52,13 +52,30 @@ async def auth_via_google(request:Request, session:SessionDep):
                 raise HTTPException(
                     status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="failed to create new user via google authentication"
                 )
+            access_token = create_access_token(data=new_user.id, expires_at=28)
 
-            return new_user
+            db_object = UserRead.model_validate(new_user)
+
+            response = JSONResponse(
+                content={"user":db_object.model_dump(mode="json")}
+            )
+
+            response.set_cookie(
+                key="access_token",
+                value=access_token,
+                httponly= True,
+                secure= True,
+                samesite="lax",
+                max_age= 60 * 60 * 24 * 28
+            )
+            return response
         else:
             access_token = create_access_token(data=user_exists.id, expires_at=28)
 
+            db_object = UserRead.model_validate(user_exists)
+
             response = JSONResponse(
-                content={"user":user_exists.model_dump(mode="json")}
+                content={"user":db_object.model_dump(mode="json")}
             )
             response.set_cookie(
                 key="access_token",
@@ -69,7 +86,4 @@ async def auth_via_google(request:Request, session:SessionDep):
                 max_age= 60 * 60 * 24 * 28
             )
 
-            return user_exists
-            
-
-    return {"message": "user logged in successfully"}
+            return response

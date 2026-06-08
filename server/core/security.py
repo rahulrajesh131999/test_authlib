@@ -2,15 +2,15 @@ from datetime import datetime, timezone, timedelta
 from pwdlib import PasswordHash
 import jwt
 
-from core.config import SettingsDep
+from core.config import settings
 
 password_hash = PasswordHash.recommended()
 
 
-def create_access_token(*,data:str, expires_at:datetime | None = None, settings:SettingsDep):
+def create_access_token(*,data:str, expires_at:datetime | None ):
 
     if expires_at:
-        expire = datetime.now(timezone.utc) + expires_at
+        expire = datetime.now(timezone.utc) + timedelta(days=expires_at)
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
 
@@ -20,11 +20,11 @@ def create_access_token(*,data:str, expires_at:datetime | None = None, settings:
 
     return encoded_jwt
 
-def decode_token(*,access_token, settings:SettingsDep):
+def decode_token(*,access_token):
     return jwt.decode(access_token, settings.JWT_SECRET, settings.JWT_ALGORITHM)
 
 def get_password_hash(plain_password:str):
     return password_hash.hash(plain_password)
 
 def verify_password_hash(plain_password:str, hash_password:str):
-    return password_hash.verify(hash_password=hash, password=plain_password)
+    return password_hash.verify(password=plain_password,hash=hash_password )

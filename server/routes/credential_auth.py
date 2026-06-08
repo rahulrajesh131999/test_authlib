@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
-from sqlmodel import Session
 
 from model import UserPass, User, UserRead
 from crud import create_new_user, authenticate
 from core.security import create_access_token
 from core.depends import Current_User
+from core.db import SessionDep
 
 router = APIRouter(prefix="/auth", tags=["/auth"])
 
 
 @router.post("/register")
-async def register(user:UserPass):
+async def register(user:UserPass, session:SessionDep):
     try:
-        created_user = await create_new_user(session=Session,
+        created_user = await create_new_user(session=session,
                                              name=user.full_name,
                                              email=user.email,
                                              password=user.password, 
@@ -50,7 +50,7 @@ async def register(user:UserPass):
 
 
 @router.post("/login")
-async def login( user:UserPass):
+async def login( user:UserPass, session:SessionDep):
 
     email = user.email
     password = user.password
@@ -61,7 +61,7 @@ async def login( user:UserPass):
         )
     
 
-    user = await authenticate(email=email, password=password, session=Session)
+    user = await authenticate(email=email, password=password, session=session)
 
     if not user:
         raise HTTPException(
@@ -70,7 +70,7 @@ async def login( user:UserPass):
     
     db_object = User.model_validate(user)
 
-    access_token = await create_access_token(data=db_object.id, expires_at=28)
+    access_token = create_access_token(data=db_object.id, expires_at=28)
 
     response = JSONResponse(
         content={"user" : db_object.model_dump(mode="json")}
@@ -96,7 +96,7 @@ async def current_user(current_user:Current_User):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User not authorized"
         )
 
-    user = UserRead.model_validate(user)
+    user = UserRead.model_validate(current_user)
 
     return JSONResponse(
         content={"user":user.model_dump(mode="json")}

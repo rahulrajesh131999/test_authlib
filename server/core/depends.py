@@ -11,7 +11,8 @@ async def current_user(session:SessionDep, access_token: Annotated[str | None , 
     if access_token:
         try:
             payload = decode_token(access_token=access_token)
-            user_id = payload.get("data")
+            print("payload",payload)
+            user_id = payload.get("sub")
 
             if not user_id:
                 raise HTTPException(

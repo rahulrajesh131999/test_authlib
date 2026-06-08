@@ -4,66 +4,67 @@ from pydantic import EmailStr
 
 from model import User, UserPass
 from core.security import get_password_hash, verify_password_hash
-from core.config import SettingsDep
+from core.config import settings
 from core.db import SessionDep
 
 
-async def create_new_user(session:SessionDep, google_id:str | None, password:str, confirm_password:str, email:EmailStr, name:str):
+async def create_new_user(session:SessionDep, email:EmailStr, name:str, google_id:str | None = None, password:str | None = None, confirm_password:str | None = None):
     
     if google_id:
-        new_user = await User(
+        new_user = User(
             full_name=name,
             email=email,
             google_login_id=google_id
         )
 
-        await session.add(new_user)
-        await session.commit()
-        await session.refresh(new_user)
+        session.add(new_user)
+        session.commit()
+        session.refresh(new_user)
 
         return new_user
     
     else:
         name = name
-        email = name
+        email = email
 
         if password != confirm_password:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="password does not match confirm password"
             )
         
-        user_exists = await session.exec(select(User).where(User.email == email))
+        result = session.exec(select(User).where(User.email == email))
+        user_exists = result.first()
 
         if user_exists:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
             )
         
-        hashed_password = await get_password_hash(plain_password=password)
+        hashed_password = get_password_hash(plain_password=password)
 
-        new_user = await User(
+        new_user = User(
             full_name=name,
             email=email,
             hashed_password = hashed_password
         )
 
-        await session.add(new_user)
-        await session.commit()
-        await session.refresh(new_user)
+        session.add(new_user)
+        session.commit()
+        session.refresh(new_user)
 
         return new_user
     
 
 
-async def authenticate(session:SessionDep, email:EmailStr, password:str, settings:SettingsDep):
-
-
+async def authenticate(session:SessionDep, email:EmailStr, password:str):
     if not email or not password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="email and password required"
         )
     
-    user = await session.exec(select(User).where(User.email == email))
+    result = session.exec(select(User).where(User.email == email))
+
+    user = result.first()
 
     if not user:
         verify_password_hash(plain_password=password, hash_password=settings.DUMMY_HASH)
@@ -71,7 +72,7 @@ async def authenticate(session:SessionDep, email:EmailStr, password:str, setting
             status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password"
         )
     
-    if not verify_password_hash(plain_password=password, hash_password=user.password):
+    if not verify_password_hash(plain_password=password, hash_password=user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password"
         )
