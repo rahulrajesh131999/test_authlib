@@ -10,7 +10,7 @@ from model import User, UserRead
 from crud import create_new_user
 from core.security import create_access_token
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 settings = get_settings()
 
 oauth = OAuth()
