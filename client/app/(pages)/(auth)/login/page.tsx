@@ -10,7 +10,7 @@ const login = () => {
         <Loginform/>
       </div>
       <div className='relative  w-150 h-150 overflow-hidden'>
-        <Image alt='image' src={stockImage} fill loading="eager" className='w-full h-full object-cover rounded-md'/>
+        <Image alt='image' src={stockImage} fill className='w-full h-full object-cover rounded-md'/>
       </div>
     </div>
   )

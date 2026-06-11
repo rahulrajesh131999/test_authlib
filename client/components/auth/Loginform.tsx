@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 
 import googlesvg from "@/assets/svgs/google-icon-logo-svgrepo-com.svg"
+import { loginapi } from '@/services/operations/authAPI'
+import { useRouter } from 'next/navigation'
 
 
 const Loginform = () => {
@@ -12,6 +14,7 @@ const Loginform = () => {
     })
 
     const {email, password} = formData;
+    const router = useRouter()
 
     const onchangeHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setFormData((prevdata)=>({
@@ -21,12 +24,19 @@ const Loginform = () => {
     }
 
     const onSubmitHandler = async(e:React.SubmitEvent<HTMLFormElement>)=>{
-        
+        e.preventDefault()
+        const data = await loginapi({email,password})
+        if(!data){
+            console.log("failed to login")
+            return
+        }
+
+        router.push("/dashboard")
     }
 
-    const onClickGoogleHandler =()=>{
-
-    }
+     const onClickGoogleHandler = ()=>{
+          window.location.assign("http://localhost:8000/api/v1/auth/login/google")
+        }
 
   return (
     <div className='flex flex-col w-full'>
@@ -39,7 +49,7 @@ const Loginform = () => {
             <input type="password" value={password} onChange={onchangeHandler} name='password' placeholder='********' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
             <button type='submit' className='bg-blue-500 py-3 rounded-md font-medium text-amber-50 hover:bg-blue-700 cursor-pointer transition-all duration-500'>login</button>
         </form>
-        <p className='text-sm select-none pt-4'>Don't have and account? <a className='font-semibold hover:underline transition-all duration-300' href="/register">Sign up</a></p>
+        <p className='text-sm select-none pt-4'>Don't have and account? <a className='font-semibold hover:underline transition-all duration-300' href="/">Sign up</a></p>
         <div className='h-px bg-black my-5'></div>
         <button onClick={onClickGoogleHandler} className='border cursor-pointer hover:bg-blue-200 transition-all duration-300 flex items-center justify-center gap-2 border-gray-700 py-3 group rounded-md'><span className='flex items-center justify-center'><img loading='eager' src={googlesvg.src} alt="logo" className='h-5 w-5 group-hover:rotate-360 duration-700 transition-all'/></span>Sign in with Google</button>
     </div>

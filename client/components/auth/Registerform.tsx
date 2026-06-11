@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 
 import googlesvg from "@/assets/svgs/google-icon-logo-svgrepo-com.svg"
+import { registerapi } from '@/services/operations/authAPI'
+import { useRouter } from 'next/navigation'
 
 
 const Registerform = () => {
@@ -14,6 +16,7 @@ const Registerform = () => {
     })
 
     const {fullName, email, password, confirmPassword } = formData;
+    const router = useRouter()
 
     const onchangeHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setFormData((prevdata)=>({
@@ -23,12 +26,31 @@ const Registerform = () => {
     }
 
     const onSubmitHandler = async(e:React.SubmitEvent<HTMLFormElement>)=>{
-        
+
+      e.preventDefault()
+
+        if(password != confirmPassword){
+          console.error("password and confirm password does not match")
+          return
+        }
+
+        if (password.length < 8 ){
+          console.log("password length is less than 8")
+          return
+        }
+
+       const data =  await registerapi({fullName, email, password,confirmPassword})
+
+       if(!data){
+        throw new Error("failed to register user")
+       }
+
+       router.push("/dashboard")
     }
 
-    const onClickGoogleHandler =()=>{
-
-    }
+        const onClickGoogleHandler = ()=>{
+          window.location.assign("http://localhost:8000/api/v1/auth/login/google")
+        }
 
   return (
     <div className='flex flex-col w-full'>
@@ -40,7 +62,7 @@ const Registerform = () => {
             <input type="text" value={fullName} onChange={onchangeHandler} name='fullName' placeholder='John Doe' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
             <input type="email"  value={email} onChange={onchangeHandler} name='email' placeholder='abc@email.com' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
             <input type="password" value={password} onChange={onchangeHandler} name='password' placeholder='********' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
-            <input type="password" value={confirmPassword} onChange={onchangeHandler} name='password' placeholder='********' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
+            <input type="password" value={confirmPassword} onChange={onchangeHandler} name='confirmPassword' placeholder='********' className='border pl-2.5 py-3 border-t-0 border-l-0 border-r-0'/>
             <button type='submit' className='bg-blue-500 py-3 rounded-md font-medium text-amber-50 hover:bg-blue-700 cursor-pointer transition-all duration-500'>sign up</button>
         </form>
         <p className='text-sm select-none pt-4'>Already a member? <a className='font-semibold hover:underline transition-all duration-300' href="/login">login</a></p>

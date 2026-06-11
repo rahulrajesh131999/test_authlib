@@ -1,9 +1,19 @@
+import Registerform from '@/components/auth/Registerform'
+import React from 'react'
+import Image from 'next/image'
+import stockImage from "@/assets/images/antipolygon-youtube-l6SwTEW2i9I-unsplash.jpg"
 
-
-export default function Home() {
+const app = () => {
   return (
-    <div className="flex items-center justify-center h-screen">
-      <p>Hello there : - )</p>
+    <div className='flex justify-between min-h-screen items-center'>
+      <div className="w-100">
+        <Registerform/>
+      </div>
+      <div className='relative  w-150 h-150 overflow-hidden'>
+        <Image alt='image' src={stockImage} fill className='w-full h-full object-cover rounded-md'/>
+      </div>
     </div>
-  );
+  )
 }
+
+export default app
