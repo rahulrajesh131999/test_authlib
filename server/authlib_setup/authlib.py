@@ -1,7 +1,7 @@
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from starlette.requests import Request
 from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlmodel import select
 
 from core.config import get_settings
@@ -41,7 +41,8 @@ async def auth_via_google(request:Request, session:SessionDep):
     user = token.get("userinfo")
 
     if user:
-        request.session["user"] = dict(user)
+
+        request.session["user"] = dict(user) # use this only to store session for auth
 
         user_exists = session.exec(select(User).where(User.email == user.email)).first()
 
@@ -56,34 +57,41 @@ async def auth_via_google(request:Request, session:SessionDep):
 
             db_object = UserRead.model_validate(new_user)
 
-            response = JSONResponse(
-                content={"user":db_object.model_dump(mode="json")}
+            response = RedirectResponse(
+                url="http://localhost:3000/dashboard",
+                status_code=302
             )
 
             response.set_cookie(
                 key="access_token",
                 value=access_token,
                 httponly= True,
-                secure= True,
+                #secure= True,
                 samesite="lax",
+                path="/",
                 max_age= 60 * 60 * 24 * 28
             )
+
+            # print("printing response headers",response.headers)
             return response
         else:
             access_token = create_access_token(data=user_exists.id, expires_at=28)
 
             db_object = UserRead.model_validate(user_exists)
 
-            response = JSONResponse(
-                content={"user":db_object.model_dump(mode="json")}
+            response = RedirectResponse(
+                url="http://localhost:3000/dashboard",
+                status_code=302
             )
             response.set_cookie(
                 key="access_token",
                 value=access_token,
                 httponly= True,
-                secure= True,
+                #secure= True,
                 samesite="lax",
+                path="/",
                 max_age= 60 * 60 * 24 * 28
             )
 
+            # print("printing response headers",response.headers)
             return response

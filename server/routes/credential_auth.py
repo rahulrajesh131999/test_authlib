@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
+from fastapi.requests import Request
 
-from model import UserPass, User, UserRead
+from model import UserPass, User, UserRead, UserLogin
 from crud import create_new_user, authenticate
 from core.security import create_access_token
 from core.depends import Current_User
@@ -37,7 +38,7 @@ async def register(user:UserPass, session:SessionDep):
             value=access_token,
             httponly=True,
             samesite="lax",
-            secure=True,
+            #secure=True,
             max_age=60* 60 * 24 * 28
         )
 
@@ -50,7 +51,7 @@ async def register(user:UserPass, session:SessionDep):
 
 
 @router.post("/login")
-async def login( user:UserPass, session:SessionDep):
+async def login( user:UserLogin, session:SessionDep):
 
     email = user.email
     password = user.password
@@ -80,7 +81,7 @@ async def login( user:UserPass, session:SessionDep):
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=True,
+        #secure=True,
         samesite="lax",
         expires= 60 * 60 * 24 * 28
     )
@@ -101,3 +102,19 @@ async def current_user(current_user:Current_User):
     return JSONResponse(
         content={"user":user.model_dump(mode="json")}
     )
+
+@router.get("/logout")
+def logout(response:Response, request:Request):
+
+    request.session.clear()
+
+    #request.session.pop("user",None)
+
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        #secure=True,
+        samesite="lax",
+    )
+
+    return {"message":"logged out"}

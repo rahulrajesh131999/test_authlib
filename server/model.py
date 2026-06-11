@@ -31,3 +31,7 @@ class UserRead(UserBase):
     id : uuid.UUID
     google_login_id : str | None = None
     created_at : datetime
+
+class UserLogin(BaseModel):
+    email : EmailStr
+    password : str
