@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import googlesvg from "@/assets/svgs/google-icon-logo-svgrepo-com.svg"
 import { loginapi } from '@/services/operations/authAPI'
 import { useRouter } from 'next/navigation'
+import { useAppDispatch,useAppSelector } from '@/reducer/reducerHooks'
+import { setUser } from '@/slices/auth.slice'
 
 
 const Loginform = () => {
@@ -15,6 +17,7 @@ const Loginform = () => {
 
     const {email, password} = formData;
     const router = useRouter()
+    const dispatch = useAppDispatch()
 
     const onchangeHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setFormData((prevdata)=>({
@@ -30,6 +33,8 @@ const Loginform = () => {
             console.log("failed to login")
             return
         }
+
+        dispatch(setUser(data.user))
 
         router.push("/dashboard")
     }

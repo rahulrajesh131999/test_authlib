@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import googlesvg from "@/assets/svgs/google-icon-logo-svgrepo-com.svg"
 import { registerapi } from '@/services/operations/authAPI'
 import { useRouter } from 'next/navigation'
+import {useAppDispatch,useAppSelector} from "@/reducer/reducerHooks"
+import { setUser } from '@/slices/auth.slice'
 
 
 const Registerform = () => {
@@ -17,6 +19,7 @@ const Registerform = () => {
 
     const {fullName, email, password, confirmPassword } = formData;
     const router = useRouter()
+    const dispatch = useAppDispatch()
 
     const onchangeHandler = (e:React.ChangeEvent<HTMLInputElement>) =>{
         setFormData((prevdata)=>({
@@ -45,6 +48,7 @@ const Registerform = () => {
         throw new Error("failed to register user")
        }
 
+       dispatch(setUser(data.user))
        router.push("/dashboard")
     }
 

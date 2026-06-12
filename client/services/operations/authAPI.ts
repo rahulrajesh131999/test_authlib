@@ -13,6 +13,8 @@ interface ReginsterData extends LoginData {
     confirmPassword : string
 }
 
+
+
 export const registerapi = async (data:ReginsterData) =>{
     const {fullName, email, password, confirmPassword} = data;
 
@@ -37,7 +39,7 @@ export const registerapi = async (data:ReginsterData) =>{
 
         const data = await response.json()
 
-        console.log("printing user details: ",data)
+        console.log("printing user details: ",data.user.id)
 
         return data
     } catch (error) {
@@ -68,7 +70,8 @@ export const loginapi = async(data:LoginData) =>{
         }
 
         const data = await response.json()
-        console.log("printing user details: ",data)
+
+        //console.log("printing user details: ",data.user.id)
         return data
 
     } catch (error) {
