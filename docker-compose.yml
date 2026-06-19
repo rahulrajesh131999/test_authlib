@@ -2,6 +2,8 @@ services:
   backend:
     build:
      context: ./server
+    env_file:
+      - ./server/.env
     container_name : authlib-backend
     ports :
       - "8000:8000"
