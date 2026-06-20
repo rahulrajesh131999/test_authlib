@@ -40,7 +40,7 @@ const Loginform = () => {
     }
 
      const onClickGoogleHandler = ()=>{
-          window.location.assign("http://localhost:8000/api/v1/auth/login/google")
+          window.location.assign("https://test-authlib-server.onrender.com/api/v1/auth/login/google") 
         }
 
   return (
