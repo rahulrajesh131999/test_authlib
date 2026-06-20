@@ -58,7 +58,7 @@ async def auth_via_google(request:Request, session:SessionDep):
             db_object = UserRead.model_validate(new_user)
 
             response = RedirectResponse(
-                url="http://localhost:3000/dashboard",
+                url="https://test-authlib-client.onrender.com/dashboard",
                 status_code=302
             )
 
