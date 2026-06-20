@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import Response
 from contextlib import asynccontextmanager
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,6 +38,10 @@ routers = [
 
 for router in routers:
     app.include_router(router, prefix="/api/v1")
+
+@app.head("/")
+def root_head():
+    return Response(status_code=200)
 
 
 @app.get("/")
