@@ -43,6 +43,10 @@ for router in routers:
 def root_head():
     return Response(status_code=200)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 
 @app.get("/")
 def home():
