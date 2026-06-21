@@ -66,8 +66,8 @@ async def auth_via_google(request:Request, session:SessionDep):
                 key="access_token",
                 value=access_token,
                 httponly= True,
-                #secure= True,
-                samesite="lax",
+                secure= True,
+                samesite="none",
                 path="/",
                 max_age= 60 * 60 * 24 * 28
             )
@@ -87,8 +87,8 @@ async def auth_via_google(request:Request, session:SessionDep):
                 key="access_token",
                 value=access_token,
                 httponly= True,
-                #secure= True,
-                samesite="lax",
+                secure= True,
+                samesite="none",
                 path="/",
                 max_age= 60 * 60 * 24 * 28,
             )

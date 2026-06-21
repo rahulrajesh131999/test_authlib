@@ -37,8 +37,8 @@ async def register(user:UserPass, session:SessionDep):
             key="access_token",
             value=access_token,
             httponly=True,
-            samesite="lax",
-            #secure=True,
+            samesite="none",
+            secure=True,
             max_age=60* 60 * 24 * 28
         )
 
@@ -81,8 +81,8 @@ async def login( user:UserLogin, session:SessionDep):
         key="access_token",
         value=access_token,
         httponly=True,
-        #secure=True,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         expires= 60 * 60 * 24 * 28
     )
 
@@ -113,8 +113,8 @@ def logout(response:Response, request:Request):
     response.delete_cookie(
         key="access_token",
         httponly=True,
-        #secure=True,
-        samesite="lax",
+        secure=True,
+        samesite="none",
     )
 
     return {"message":"logged out"}
