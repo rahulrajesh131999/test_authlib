@@ -90,7 +90,7 @@ async def auth_via_google(request:Request, session:SessionDep):
                 #secure= True,
                 samesite="lax",
                 path="/",
-                max_age= 60 * 60 * 24 * 28
+                max_age= 60 * 60 * 24 * 28,
             )
 
             # print("printing response headers",response.headers)
